@@ -1,0 +1,38 @@
+class UnionFind:
+    def __init__ (self, n):
+        self.parent = list(range(n))
+        self.rank = [0]*n
+        self.count = n
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x] 
+    def union(self,x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x == root_y:
+            return
+        if self.rank[root_x] < self.rank[root_y]:
+            # Error 1 Fix: Make root_y the parent of root_x by updating self.parent
+            self.parent[root_x] = root_y
+            
+        # Error 2 Fix: Change conditional from '>' to '<' for correct logic, or use 'else' for remaining case
+        elif self.rank[root_y] < self.rank[root_x]: 
+            # Make root_x the parent of root_y
+            self.parent[root_y] = root_x
+            
+        else:
+            # Ranks are equal: Make root_x the parent of root_y
+            # Error 1 Fix: Update self.parent
+            self.parent[root_y] = root_x 
+            self.rank[root_x] += 1 # Only increment the rank of the new root
+        self.count -= 1 
+class Solution:                       
+    def findCircleNum(self, isConnected: List[List[int]]) -> int:
+        n = len(isConnected)
+        uf = UnionFind(n)
+        for i in range(n):
+            for j in range(i+1, n):
+                if isConnected[i][j] == 1:
+                    uf.union(i, j)
+        return uf.count
